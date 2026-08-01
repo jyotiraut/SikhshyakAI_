@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
-        extra="ignore"   # 👈 THIS FIXES YOUR ERROR
+        extra="ignore"   #  THIS FIXES YOUR ERROR
     )
 
 

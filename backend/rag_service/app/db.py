@@ -16,16 +16,16 @@ db = Database()
 async def connect_to_mongo():
     """Connect to MongoDB"""
     try:
-        logger.info(f"🔌 Connecting to MongoDB: {settings.mongodb_uri}/{settings.db_name}")
+        logger.info(f" Connecting to MongoDB: {settings.mongodb_uri}/{settings.db_name}")
         db.client = AsyncIOMotorClient(settings.mongodb_uri)
         db.db = db.client[settings.db_name]
         
         # Test connection
         await db.client.admin.command('ping')
-        logger.info("✅ Connected to MongoDB successfully")
+        logger.info("[ok] Connected to MongoDB successfully")
         
     except Exception as e:
-        logger.error(f"❌ Failed to connect to MongoDB: {str(e)}")
+        logger.error(f"[error] Failed to connect to MongoDB: {str(e)}")
         raise e
 
 async def ensure_indexes():
@@ -39,16 +39,16 @@ async def ensure_indexes():
         await db.db.document_summaries.create_index([("unit_id", 1)], unique=True)
         await db.db.chat_messages.create_index([("session_id", 1), ("created_at", 1)])
         await db.db.chat_sessions.create_index([("user_id", 1), ("status", 1), ("last_message_at", -1)])
-        logger.info("✅ RAG indexes ensured")
+        logger.info("[ok] RAG indexes ensured")
     except Exception as e:
-        logger.error(f"⚠️  Failed to ensure indexes: {e}")
+        logger.error(f"[warn]  Failed to ensure indexes: {e}")
 
 
 async def close_mongo_connection():
     """Close MongoDB connection"""
     if db.client:
         db.client.close()
-        logger.info("🔌 MongoDB connection closed")
+        logger.info(" MongoDB connection closed")
 
 def get_database():
     """Get database instance"""

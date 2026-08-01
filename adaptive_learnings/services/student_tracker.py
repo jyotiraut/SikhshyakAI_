@@ -55,12 +55,12 @@ class StudentTracker:
         """Build sequential features for SAKT model from MongoDB data"""
         
         try:
-            print(f"📚 Building feature sequence for course {course_id}")
+            print(f" Building feature sequence for course {course_id}")
             
             quizzes = self.get_quiz_history(course_id=course_id, limit=max_length)
             
             if not quizzes:
-                print(f"⚠️  No quiz history found")
+                print(f"[warn]  No quiz history found")
                 return []
             
             print(f"   Found {len(quizzes)} quizzes")
@@ -80,11 +80,11 @@ class StudentTracker:
                     
                     # Validate data
                     if total_questions <= 0:
-                        print(f"   ⚠️  Skipping quiz {idx}: invalid total_questions={total_questions}")
+                        print(f"   [warn]  Skipping quiz {idx}: invalid total_questions={total_questions}")
                         continue
                     
                     if correct_answers < 0 or correct_answers > total_questions:
-                        print(f"   ⚠️  Fixing invalid score: {correct_answers}/{total_questions}")
+                        print(f"   [warn]  Fixing invalid score: {correct_answers}/{total_questions}")
                         correct_answers = max(0, min(correct_answers, total_questions))
                     
                     # Calculate accuracy
@@ -158,12 +158,12 @@ class StudentTracker:
                     
                     # Validate feature vector
                     if len(feature_vec) != 16:
-                        print(f"   ❌ ERROR: Feature vector has {len(feature_vec)} elements, expected 16")
+                        print(f"   [error] ERROR: Feature vector has {len(feature_vec)} elements, expected 16")
                         continue
                     
                     # Check for NaN or inf values
                     if any(np.isnan(v) or np.isinf(v) for v in feature_vec):
-                        print(f"   ⚠️  Skipping quiz {idx}: contains NaN or Inf values")
+                        print(f"   [warn]  Skipping quiz {idx}: contains NaN or Inf values")
                         continue
                     
                     features.append({
@@ -181,14 +181,14 @@ class StudentTracker:
                     })
                     
                 except Exception as e:
-                    print(f"   ⚠️  Error processing quiz {idx}: {type(e).__name__}: {e}")
+                    print(f"   [warn]  Error processing quiz {idx}: {type(e).__name__}: {e}")
                     continue
             
-            print(f"   ✅ Built {len(features)} valid feature vectors")
+            print(f"   [ok] Built {len(features)} valid feature vectors")
             return features
             
         except Exception as e:
-            print(f"❌ Error in build_feature_sequence: {type(e).__name__}: {e}")
+            print(f"[error] Error in build_feature_sequence: {type(e).__name__}: {e}")
             import traceback
             traceback.print_exc()
             return []
@@ -247,7 +247,7 @@ class StudentTracker:
             }
             
         except Exception as e:
-            print(f"❌ Error in get_current_performance_summary: {e}")
+            print(f"[error] Error in get_current_performance_summary: {e}")
             return {
                 "total_quizzes": 0,
                 "avg_score": 0.0,
@@ -281,9 +281,9 @@ class StudentTracker:
             )
             
             if result.modified_count > 0:
-                print(f"✅ Updated quiz submission {quiz_id}")
+                print(f"[ok] Updated quiz submission {quiz_id}")
             else:
-                print(f"⚠️  Quiz submission {quiz_id} not found or not modified")
+                print(f"[warn]  Quiz submission {quiz_id} not found or not modified")
                 
         except Exception as e:
-            print(f"❌ Error updating quiz submission: {e}")
+            print(f"[error] Error updating quiz submission: {e}")

@@ -26,9 +26,9 @@ class DatabaseManager:
             self._db = self._client[os.getenv('DATABASE_NAME')]
             # Test connection
             self._client.admin.command('ping')
-            print("✅ Connected to MongoDB successfully!")
+            print("[ok] Connected to MongoDB successfully!")
         except Exception as e:
-            print(f"❌ Failed to connect to MongoDB: {e}")
+            print(f"[error] Failed to connect to MongoDB: {e}")
             raise
     
     def get_database(self) -> Database:

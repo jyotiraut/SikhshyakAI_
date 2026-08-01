@@ -355,11 +355,11 @@ if __name__ == "__main__":
     print("\nTesting forward pass...")
     mastery, difficulty, pace, next_skill, attn_weights = model(x, mask)
     
-    print(f"✅ Mastery shape: {mastery.shape}")
-    print(f"✅ Difficulty shape: {difficulty.shape}")
-    print(f"✅ Pace shape: {pace.shape}")
-    print(f"✅ Next skill shape: {next_skill.shape}")
-    print(f"✅ Attention weights shape: {attn_weights.shape}")
+    print(f"[ok] Mastery shape: {mastery.shape}")
+    print(f"[ok] Difficulty shape: {difficulty.shape}")
+    print(f"[ok] Pace shape: {pace.shape}")
+    print(f"[ok] Next skill shape: {next_skill.shape}")
+    print(f"[ok] Attention weights shape: {attn_weights.shape}")
     
     print("\nSample predictions:")
     print(f"Mastery: {mastery[0].item():.4f}")

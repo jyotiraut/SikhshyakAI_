@@ -30,6 +30,6 @@ settings = Settings()
 # Validate required settings
 def validate_settings():
     if not settings.google_api_key or settings.google_api_key == "your_google_api_key_here":
-        print("⚠️  WARNING: GOOGLE_API_KEY not set. Get one from https://aistudio.google.com/apikey")
+        print("[warn]  WARNING: GOOGLE_API_KEY not set. Get one from https://aistudio.google.com/apikey")
         return False
     return True

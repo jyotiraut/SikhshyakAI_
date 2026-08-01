@@ -68,50 +68,50 @@ def setup_logging():
 logger = logging.getLogger(__name__)
 
 def log_info(message: str, data: dict = None):
-    logger.info(f"ℹ️  {message}")
+    logger.info(f"ℹ  {message}")
     if data:
         logger.info(f"   └─ {data}")
 
 def log_success(message: str, data: dict = None):
-    logger.info(f"✅ {message}")
+    logger.info(f"[ok] {message}")
     if data:
         logger.info(f"   └─ {data}")
 
 def log_warning(message: str, data: dict = None):
-    logger.warning(f"⚠️  {message}")
+    logger.warning(f"[warn]  {message}")
     if data:
         logger.warning(f"   └─ {data}")
 
 def log_error(message: str, error: Exception = None):
-    logger.error(f"❌ {message}")
+    logger.error(f"[error] {message}")
     if error:
         logger.error(f"   └─ {str(error)}")
 
 def log_chat(role: str, message: str):
-    icon = "👤" if role == "user" else "🤖"
+    icon = "" if role == "user" else ""
     color = Colors.MAGENTA if role == "user" else Colors.GREEN
     preview = message[:100] + "..." if len(message) > 100 else message
     logger.info(f"{icon} {color}{role.upper()}{Colors.RESET}: {preview}")
 
 def log_embed(message: str, data: dict = None):
-    logger.info(f"🔮 EMBED: {message}")
+    logger.info(f" EMBED: {message}")
     if data:
         logger.info(f"   └─ {data}")
 
 def log_search(message: str, data: dict = None):
-    logger.info(f"🔍 SEARCH: {message}")
+    logger.info(f" SEARCH: {message}")
     if data:
         logger.info(f"   └─ {data}")
 
 def log_db(message: str, data: dict = None):
-    logger.info(f"💾 DB: {message}")
+    logger.info(f" DB: {message}")
     if data:
         logger.info(f"   └─ {data}")
 
 def log_api(method: str, path: str, status: int = None):
     status_color = Colors.GREEN if status and status < 400 else Colors.RED if status else Colors.WHITE
     status_str = f" {status_color}[{status}]{Colors.RESET}" if status else ""
-    logger.info(f"→ {method} {path}{status_str}")
+    logger.info(f" {method} {path}{status_str}")
 
 def log_divider():
     logger.info("─" * 60)

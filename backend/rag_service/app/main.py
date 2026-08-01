@@ -34,8 +34,8 @@ async def lifespan(app: FastAPI):
     
     log_divider()
     log_info("Service Status:")
-    log_info(f"  Embedding: {'✓ Ready' if embedding_initialized else '✗ Not ready'}")
-    log_info(f"  Chat: {'✓ Ready' if chat_initialized else '✗ Not ready'}")
+    log_info(f"  Embedding: {'[ok] Ready' if embedding_initialized else '[x] Not ready'}")
+    log_info(f"  Chat: {'[ok] Ready' if chat_initialized else '[x] Not ready'}")
     log_divider()
     
     log_success(f"RAG Service running on port {settings.rag_port}")
