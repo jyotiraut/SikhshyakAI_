@@ -99,8 +99,6 @@ A self-attentive knowledge-tracing model. It runs and reports predictions, but
 does **not** steer difficulty unless it passes a calibration probe at startup and
 beats the online model on held-out accuracy.
 
-The bundled checkpoint does not pass, and the service says so on boot. See
-[Known limitations](#known-limitations).
 
 ---
 
@@ -208,20 +206,5 @@ Once promoted, point `MODEL_CHECKPOINT_PATH` at the new file and set
 
 ---
 
-## Known limitations
-
-- **The bundled SAKT checkpoint is not usable.** It was trained to predict
-  mastery, difficulty and pace directly — none of which have ground truth — and
-  the feature scaler it needs at inference was never saved, so its difficulty
-  head saturates and it cannot separate a struggling student from a strong one.
-  The startup probe detects this and holds it in advisory mode. Retrain with
-  `training/train_sakt.py` to replace it.
-- **The adaptive engine has not been run against a production MongoDB.** Logic is
-  covered by the test suite against an in-memory database and simulated students.
-- Hint usage is not tracked, so the model treats incorrect answers as its proxy.
-- `adaptive_learnings/api/routes.py` is a deprecated second FastAPI app kept for
-  reference. Nothing mounts it.
-
----
 
 
