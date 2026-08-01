@@ -33,6 +33,11 @@ export const useLoginUser = () => {
       if (data.user.departmentId) {
         localStorage.setItem('departmentId', data.user.departmentId);
         setDepartmentId(data.user.departmentId);
+      } else {
+        // Clear a stale value from a previous session, otherwise a user without
+        // a department inherits the last one that was stored.
+        localStorage.removeItem('departmentId');
+        setDepartmentId(undefined);
       }
       setRole(data.role);
       setUser(data.user);

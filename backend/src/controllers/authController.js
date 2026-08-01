@@ -76,8 +76,9 @@ const createTransporter = () => {
 
 // Updated Signup function
 import School from '../models/schoolModel.js';
+import Department from '../models/departmentModel.js';
 export const signup = async (req, res) => {
-  const { fullName, email, password, confirmPassword, role, school, collegeRollNo } = req.body;
+  const { fullName, email, password, confirmPassword, role, school, collegeRollNo, department } = req.body;
 
   if (password !== confirmPassword) {
     return res.status(400).json({
@@ -101,6 +102,21 @@ export const signup = async (req, res) => {
       // ensure unique roll per school
       const existing = await User.findOne({ school, collegeRollNo });
       if (existing) return res.status(400).json({ status: 'fail', message: 'collegeRollNo already registered for this school' });
+
+      // The signup form makes department required and sends it, but it used to
+      // be dropped here, so every student was created without one.
+      if (!department) {
+        return res.status(400).json({ status: 'fail', message: 'department is required for students' });
+      }
+      const departmentDoc = await Department.findById(department);
+      if (!departmentDoc) {
+        return res.status(400).json({ status: 'fail', message: 'Invalid department id' });
+      }
+      // A department belongs to a school; picking one from a different school
+      // would put the student outside their own tenant.
+      if (String(departmentDoc.school) !== String(school)) {
+        return res.status(400).json({ status: 'fail', message: 'Department does not belong to the selected school' });
+      }
     }
 
     if (chosenRole === 'teacher') {
@@ -116,6 +132,7 @@ export const signup = async (req, res) => {
       password,
       role: chosenRole,
       school: school || undefined,
+      department: department || undefined,
       collegeRollNo: collegeRollNo || undefined,
       isEmailVerified: false,
     });
@@ -312,9 +329,14 @@ export const login = async (req, res) => {
       schoolId: user.school,
     };
 
-    // Include departmentId for HOD users
-    if (user.role === 'hod') {
+    // Department belongs to students and teachers too, not only HODs - gating
+    // this on the HOD role is why a student could never see their department.
+    if (user.department) {
+      const department = await Department.findById(user.department).select('name');
       userResponse.departmentId = user.department;
+      if (department) {
+        userResponse.departmentName = department.name;
+      }
     }
 
     res.status(200).json({

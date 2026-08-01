@@ -8,6 +8,8 @@ type User = {
   role: Role;
   schoolId?: string;
   departmentId?: string;
+  /** Resolved on login so the UI can show the department without a second call. */
+  departmentName?: string;
 };
 
 type UserContextType = {

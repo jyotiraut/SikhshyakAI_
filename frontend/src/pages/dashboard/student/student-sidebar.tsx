@@ -1,4 +1,4 @@
-import { Brain, CopyPlus, FileCheck, Home, Inbox, Settings } from 'lucide-react';
+import { Brain, Building2, CopyPlus, FileCheck, Home, Inbox, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router';
 import {
   Sidebar,
@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/lib/provider/use-auth-provider';
 
 // Menu items.
 const items = [
@@ -49,10 +50,27 @@ const items = [
 
 export function StudentSidebar() {
   const location = useLocation();
+  const { user } = useAuth();
 
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        {user && (
+          <div className='px-2 py-3'>
+            <p className='truncate text-sm font-medium text-foreground'>{user.fullName}</p>
+            {user.departmentName ? (
+              <p className='mt-1 flex items-center gap-1.5 text-xs text-muted-foreground'>
+                <Building2 className='h-3.5 w-3.5 shrink-0' />
+                <span className='truncate'>{user.departmentName}</span>
+              </p>
+            ) : (
+              // Accounts created before the department was captured at signup
+              // have none on record; say so rather than showing a blank line.
+              <p className='mt-1 text-xs text-muted-foreground italic'>No department assigned</p>
+            )}
+          </div>
+        )}
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup />
         <SidebarGroupLabel>
