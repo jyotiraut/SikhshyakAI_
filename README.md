@@ -224,11 +224,4 @@ Once promoted, point `MODEL_CHECKPOINT_PATH` at the new file and set
 
 ---
 
-## License
 
-Released under the **MIT License** — see [LICENSE](frontend/LICENSE).
-
-> **Note:** licensing is currently inconsistent across the repo. `frontend/LICENSE`
-> is MIT (© 2025 Avash Mani Dahal) while `backend/package.json` declares ISC with a
-> different author. Pick one, move the `LICENSE` file to the repository root, and
-> make the `package.json` fields agree before publishing or accepting contributions.
