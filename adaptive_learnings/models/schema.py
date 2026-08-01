@@ -18,6 +18,19 @@ class QuizAnswer(BaseModel):
     # handler and raise an IndexError as a 500.
     answers: List[Dict[str, Any]] = Field(min_length=1)  # {questionIndex, selectedOption}
 
+class CourseMeta(BaseModel):
+    periodDurationMinutes: Optional[int] = None
+    totalPeriods: Optional[int] = None
+    pace: Optional[str] = "normal"
+    language: Optional[str] = "en"
+
+
+class EnrichCourseRequest(BaseModel):
+    """Turn a raw syllabus into structured units. Field names match the Node caller."""
+    outlineText: str = Field(min_length=20)
+    courseMeta: Optional[CourseMeta] = None
+
+
 class GenerateAssessmentRequest(BaseModel):
     """Teacher-facing bulk generation for a whole unit."""
     course_id: str

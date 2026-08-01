@@ -93,11 +93,10 @@ async function extractTextFromBuffer(buffer) {
 // Helper: call RAG FastAPI to enrich course (units, teachingPlan, estimatedTime)
 // Uses `RAG_URL` or falls back to `FASTAPI_URL` (http://fastapi-host:8000)
 async function callRagEnrichCourse(outlineText, courseMeta) {
-  const baseUrl = process.env.RAG_URL || process.env.FASTAPI_URL;
-  if (!baseUrl) {
-    throw new Error('RAG_URL or FASTAPI_URL environment variable is not set');
-  }
-  const url = `${baseUrl.replace(/\/$/, '')}/rag/enrich-course`;
+  // Previously posted to /rag/enrich-course, a route that exists in no service
+  // in this project, so course creation could never produce units.
+  const baseUrl = process.env.ADAPTIVE_LEARNING_URL || 'http://localhost:4000';
+  const url = `${baseUrl.replace(/\/$/, '')}/api/adaptive/enrich-course`;
   const payload = {
     outlineText,
     courseMeta
@@ -205,8 +204,9 @@ export const createCourse = async (req, res) => {
       }
     }
 
-    // Call RAG to enrich course (units, teachingPlan, estimatedTime)
+    // Generate the unit breakdown from the outline
     let ragResponse = null;
+    let enrichError = null;
     try {
       ragResponse = await callRagEnrichCourse(outlineText, {
         periodDurationMinutes: Number(periodDurationMinutes) || undefined,
@@ -215,13 +215,19 @@ export const createCourse = async (req, res) => {
         language: language || 'en'
       });
     } catch (err) {
-      // Do not fail hard — we already created course
+      // Do not fail hard here — the course row already exists.
       const status = err?.response?.status;
       const data = err?.response?.data;
-      console.error('RAG enrich error:', err.message || err);
-      if (status) console.error('RAG status:', status);
-      if (data) console.error('RAG response:', typeof data === 'object' ? JSON.stringify(data) : data);
-      console.error('RAG URL used:', (process.env.RAG_URL || process.env.FASTAPI_URL));
+      // Carry the real reason through to the response instead of discarding it.
+      enrichError =
+        data?.detail ||
+        (err.code === 'ECONNREFUSED'
+          ? `Generator not reachable at ${process.env.ADAPTIVE_LEARNING_URL || 'http://localhost:4000'} - is the adaptive service running?`
+          : err.message || 'unknown error');
+      console.error('Course enrichment error:', enrichError);
+      if (status) console.error('Generator status:', status);
+      if (data) console.error('Generator response:', typeof data === 'object' ? JSON.stringify(data) : data);
+      console.error('Generator URL used:', process.env.ADAPTIVE_LEARNING_URL || 'http://localhost:4000');
     }
 
     // If RAG returned units, create Unit documents and proceed; else error
@@ -251,9 +257,15 @@ export const createCourse = async (req, res) => {
       course.status = 'generated';
       await course.save();
     } else {
-      // No units from RAG — do not proceed; return explicit Gemini Error
-      console.error('[Course:create] RAG did not return units');
-      return res.status(502).json({ status: 'error', message: 'Gemini Error' });
+      // Report what actually failed. This used to say "Gemini Error" even when
+      // the generator was unreachable and Gemini was never called.
+      console.error('[Course:create] generator returned no units');
+      return res.status(502).json({
+        status: 'error',
+        message: enrichError
+          ? `Could not generate units: ${enrichError}`
+          : 'The generator returned no units for this outline. Check that the outline lists actual topics.'
+      });
     }
 
     res.status(201).json({
@@ -388,8 +400,11 @@ export const updateCourse = async (req, res) => {
           course.status = 'generated';
           await course.save();
         } else {
-          // If re-enrichment returns no units, signal Gemini Error
-          return res.status(502).json({ status: 'error', message: 'Gemini Error' });
+          console.error('[Course:update] generator returned no units');
+          return res.status(502).json({
+            status: 'error',
+            message: 'Could not regenerate units from the updated outline.'
+          });
         }
       } catch (err) {
         const status = err?.response?.status;
@@ -397,7 +412,7 @@ export const updateCourse = async (req, res) => {
         console.error('RAG enrich error (update):', err.message || err);
         if (status) console.error('RAG status:', status);
         if (data) console.error('RAG response:', typeof data === 'object' ? JSON.stringify(data) : data);
-        console.error('RAG URL used:', (process.env.RAG_URL || process.env.FASTAPI_URL));
+        console.error('Generator URL used:', process.env.ADAPTIVE_LEARNING_URL || 'http://localhost:4000');
         // Do not fail the update due to enrichment errors
       }
     }

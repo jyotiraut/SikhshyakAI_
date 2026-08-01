@@ -14,6 +14,7 @@ from core.logger import logger
 from integration.assessment_adapter import AdaptiveAssessmentAdapter
 from models.schema import (
     CreateAdaptiveLearningRequest,
+    EnrichCourseRequest,
     GenerateAssessmentRequest,
     QuizAnswer,
     QuizRequest,
@@ -31,6 +32,7 @@ from services.adaptive_service import (
     update_adaptive_learning_with_recalculation,
 )
 from services.assestment_chain import AssessmentChain, QuizGenerationError
+from services.course_enricher import CourseEnrichmentError, get_enricher
 from services.online_learner import online_learner
 from services.sakt_service import sakt_service
 
@@ -466,6 +468,46 @@ def submit_quiz(submission: QuizAnswer):
         )
 
     return response
+
+
+# -------------------- Teacher: outline -> units --------------------
+@router.post("/enrich-course")
+def enrich_course(req: EnrichCourseRequest):
+    """
+    Break a course outline into structured units.
+
+    Backs the teacher-facing course creation flow, which previously posted to
+    /rag/enrich-course on a service that does not exist in this project - the
+    caller reported that as a generic "Gemini Error" without ever reaching Gemini.
+    """
+    meta = req.courseMeta.model_dump() if req.courseMeta else {}
+    try:
+        result = get_enricher().enrich(req.outlineText, meta)
+    except ValueError as e:
+        # Missing API key and similar configuration problems.
+        logger.error("enrich-course misconfigured: %s", e)
+        raise HTTPException(status_code=503, detail=str(e))
+    except CourseEnrichmentError as e:
+        logger.error("enrich-course failed: %s", e)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Could not build units from this outline: {e}",
+        )
+    except Exception as e:
+        logger.exception("enrich-course failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    units = result["units"]
+    logger.info(
+        "Enriched course outline into %s units (%s objectives)",
+        len(units), sum(len(u["learningObjectives"]) for u in units),
+    )
+    return {
+        "units": units,
+        "unit_count": len(units),
+        "total_objectives": sum(len(u["learningObjectives"]) for u in units),
+        "total_minutes": sum(u["estimatedTime"]["totalMinutes"] for u in units),
+    }
 
 
 # -------------------- Teacher: bulk assessment generation --------------------
