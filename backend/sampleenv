@@ -5,9 +5,9 @@ JWT_SECRET=anup
 JWT_REFRESH_SECRET=anup
 JWT_EXPIRES_IN=30d
 JWT_REFRESH_EXPIRES_IN=90d
-EMAIL_USERNAME=###@gmail.com
-EMAIL_PASSWORD=$$%%
-EMAIL_HOST=smtp.example.com
+EMAIL_USERNAME=your_gmail_address@gmail.com
+EMAIL_PASSWORD=your_16_char_gmail_app_password
+EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 CLIENT_URL=http://localhost:5173/
 SESSION_SECRET=anup
@@ -20,7 +20,7 @@ RAG_SERVICE_URL=http://localhost:3000
 CLOUDINARY_CLOUD_NAME=****
 CLOUDINARY_API_KEY=******
 CLOUDINARY_API_SECRET=*****
-FRONTEND_URL=h
+FRONTEND_URL=http://localhost:5173
 
 # Defaults used by `npm run seed:admins` (optional — script has built-in fallbacks)
 SEED_SUPERADMIN_NAME=Super Admin

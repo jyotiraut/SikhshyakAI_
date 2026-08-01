@@ -149,7 +149,14 @@ export const signup = async (req, res) => {
     newUser.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
     await newUser.save();
 
-    // Send verification email
+    // Send verification email.
+    //
+    // A mail outage is not the registrant's fault. Deleting the account and
+    // returning a 500 left them with no way forward and no way to retry, so the
+    // account is kept and they are told to request a new link instead. The
+    // account still cannot be used until it is verified.
+    let emailSent = true;
+    let emailError = null;
     try {
       await sendVerificationEmail(
         newUser.email,
@@ -157,20 +164,31 @@ export const signup = async (req, res) => {
         newUser.fullName
       );
     } catch (emailErr) {
-      // If email sending fails, delete the user
-      await User.deleteOne({ _id: newUser._id });
-      return res.status(500).json({
-        status: "fail",
-        message: `Registration failed: ${emailErr.message}`,
-      });
+      emailSent = false;
+      emailError = emailErr.message;
+      console.error(`[signup] Verification email to ${newUser.email} failed:`, emailErr.message);
+      // Log the link so a developer with no SMTP configured can still verify.
+      console.error(
+        `[signup] Verification link: ${process.env.FRONTEND_URL}/verify-email/${verificationToken}`
+      );
     }
 
     // Return success without tokens (user needs to verify email first)
     res.status(201).json({
       status: "success",
-      message:
-        "Registration successful! Please check your email to verify your account.",
+      message: emailSent
+        ? "Registration successful! Please check your email to verify your account."
+        : "Account created, but the verification email could not be sent. Use 'resend verification email', or ask an administrator to verify the account.",
       requiresVerification: true,
+      emailSent,
+      // Only ever expose the link outside production, where it is a convenience
+      // for local testing rather than a way to bypass email ownership.
+      ...(!emailSent && process.env.NODE_ENV !== "production"
+        ? {
+            devVerificationUrl: `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`,
+            devEmailError: emailError,
+          }
+        : {}),
     });
   } catch (err) {
     // If user was created but something else failed, clean up
