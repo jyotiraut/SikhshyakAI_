@@ -1,0 +1,23 @@
+# --- runtime ---
+fastapi==0.109.0
+uvicorn==0.27.0
+pymongo==4.6.1
+pydantic==2.5.3
+# core/config.py imports BaseSettings from pydantic_settings; it was missing
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+# the question generator (services/assestment_chain.py); also missing
+google-generativeai==0.8.3
+numpy==1.24.3
+
+# --- tests ---
+pytest==8.0.0
+mongomock==4.3.0
+
+# --- only used by the unused SAKT experiment (models/adaptive_sakt.py) ---
+# Nothing in the running service loads these; drop them if that code is retired.
+torch==2.1.0
+pandas==2.1.4
+anthropic==0.18.1
+redis==5.0.1
+websockets==12.0

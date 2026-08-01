@@ -1,0 +1,15 @@
+pre-commit:
+  commands:
+    check:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+      run: pnpm check
+      stage_fixed: true
+# pre-push:
+#   follow: true
+#   commands:
+#     check:
+#       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+#       run: pnpm check --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {push_files}
+#     build:
+#       run: pnpm build
+# 

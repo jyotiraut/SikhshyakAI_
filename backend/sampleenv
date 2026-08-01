@@ -1,0 +1,36 @@
+CORS_ORIGIN=*
+MONGODB_URI=mongodb://localhost:27017
+PORT=8000
+JWT_SECRET=anup
+JWT_REFRESH_SECRET=anup
+JWT_EXPIRES_IN=30d
+JWT_REFRESH_EXPIRES_IN=90d
+EMAIL_USERNAME=###@gmail.com
+EMAIL_PASSWORD=$$%%
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+CLIENT_URL=http://localhost:5173/
+SESSION_SECRET=anup
+# Adaptive learning + question generation service (adaptive_learnings/main.py)
+ADAPTIVE_LEARNING_URL=http://localhost:4000
+# Milliseconds before a call to the adaptive service is aborted
+ADAPTIVE_TIMEOUT_MS=60000
+# RAG chatbot service (backend/rag_service)
+RAG_SERVICE_URL=http://localhost:3000
+CLOUDINARY_CLOUD_NAME=****
+CLOUDINARY_API_KEY=******
+CLOUDINARY_API_SECRET=*****
+FRONTEND_URL=h
+
+# Defaults used by `npm run seed:admins` (optional — script has built-in fallbacks)
+SEED_SUPERADMIN_NAME=Super Admin
+SEED_SUPERADMIN_EMAIL=superadmin@shikshyak.ai
+SEED_SUPERADMIN_PASSWORD=SuperAdmin@123
+SEED_ADMIN_NAME=School Admin
+SEED_ADMIN_EMAIL=admin@shikshyak.ai
+SEED_ADMIN_PASSWORD=Admin@123
+SEED_HOD_NAME=Department Head
+SEED_HOD_EMAIL=hod@shikshyak.ai
+SEED_HOD_PASSWORD=Hod@123
+SEED_SCHOOL_NAME=Default School
+SEED_DEPARTMENT_NAME=Computer Engineering

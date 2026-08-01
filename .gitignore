@@ -1,0 +1,42 @@
+# ---- secrets ----
+# Never commit these: they hold live database credentials and API keys.
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# ---- node ----
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# ---- logs / runtime ----
+logs/
+*.log
+npm-debug.log*
+pids
+*.pid
+
+# ---- editors / os ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- uploads and scratch ----
+backend/public/temp/*
+!backend/public/temp/.gitkeep
+uploads/
+vector_store/
